@@ -105,4 +105,11 @@ return static function (ClassMetadata $metadata, array $emConfig): void {
             ->columnName('forward_query')
             ->option('default', true)
             ->build();
+
+    $builder->createField('password', Types::STRING)
+            ->columnName('password')
+            ->length(64)
+            ->nullable()
+            ->build();
+
 };

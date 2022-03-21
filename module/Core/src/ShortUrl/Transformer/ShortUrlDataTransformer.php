@@ -34,6 +34,7 @@ class ShortUrlDataTransformer implements DataTransformerInterface
             'title' => $shortUrl->title(),
             'crawlable' => $shortUrl->crawlable(),
             'forwardQuery' => $shortUrl->forwardQuery(),
+            'password' => $shortUrl->password(),
         ];
     }
 

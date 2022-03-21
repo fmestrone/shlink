@@ -33,6 +33,7 @@ final class ShortUrlMeta implements TitleResolutionModelInterface
     private bool $titleWasAutoResolved = false;
     private bool $crawlable = false;
     private bool $forwardQuery = true;
+    private ?string $password = null;
 
     private function __construct()
     {
@@ -84,6 +85,7 @@ final class ShortUrlMeta implements TitleResolutionModelInterface
         $this->title = $inputFilter->getValue(ShortUrlInputFilter::TITLE);
         $this->crawlable = $inputFilter->getValue(ShortUrlInputFilter::CRAWLABLE);
         $this->forwardQuery = getOptionalBoolFromInputFilter($inputFilter, ShortUrlInputFilter::FORWARD_QUERY) ?? true;
+        $this->password = $inputFilter->getValue(ShortUrlInputFilter::PASSWORD);
     }
 
     public function getLongUrl(): string
@@ -202,4 +204,15 @@ final class ShortUrlMeta implements TitleResolutionModelInterface
     {
         return $this->forwardQuery;
     }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function hasPassword(): bool
+    {
+        return $this->password !== null;
+    }
+
 }

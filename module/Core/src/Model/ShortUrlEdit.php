@@ -34,6 +34,8 @@ final class ShortUrlEdit implements TitleResolutionModelInterface
     private bool $crawlable = false;
     private bool $forwardQueryPropWasProvided = false;
     private bool $forwardQuery = true;
+    private bool $passwordPropWasProvided = false;
+    private ?string $password = null;
 
     private function __construct()
     {
@@ -67,6 +69,7 @@ final class ShortUrlEdit implements TitleResolutionModelInterface
         $this->titlePropWasProvided = array_key_exists(ShortUrlInputFilter::TITLE, $data);
         $this->crawlablePropWasProvided = array_key_exists(ShortUrlInputFilter::CRAWLABLE, $data);
         $this->forwardQueryPropWasProvided = array_key_exists(ShortUrlInputFilter::FORWARD_QUERY, $data);
+        $this->passwordPropWasProvided = array_key_exists(ShortUrlInputFilter::PASSWORD, $data);
 
         $this->longUrl = $inputFilter->getValue(ShortUrlInputFilter::LONG_URL);
         $this->validSince = parseDateField($inputFilter->getValue(ShortUrlInputFilter::VALID_SINCE));
@@ -77,6 +80,7 @@ final class ShortUrlEdit implements TitleResolutionModelInterface
         $this->title = $inputFilter->getValue(ShortUrlInputFilter::TITLE);
         $this->crawlable = $inputFilter->getValue(ShortUrlInputFilter::CRAWLABLE);
         $this->forwardQuery = getOptionalBoolFromInputFilter($inputFilter, ShortUrlInputFilter::FORWARD_QUERY) ?? true;
+        $this->password = $inputFilter->getValue(ShortUrlInputFilter::PASSWORD);
     }
 
     public function longUrl(): ?string
@@ -190,4 +194,15 @@ final class ShortUrlEdit implements TitleResolutionModelInterface
     {
         return $this->forwardQueryPropWasProvided;
     }
+
+    public function password(): ?string
+    {
+        return $this->password;
+    }
+
+    public function passwordWasProvided(): bool
+    {
+        return $this->passwordPropWasProvided;
+    }
+
 }

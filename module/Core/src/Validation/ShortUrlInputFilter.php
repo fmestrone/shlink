@@ -36,6 +36,7 @@ class ShortUrlInputFilter extends InputFilter
     public const TITLE = 'title';
     public const CRAWLABLE = 'crawlable';
     public const FORWARD_QUERY = 'forwardQuery';
+    public const PASSWORD = 'password';
 
     private function __construct(array $data, bool $requireLongUrl)
     {
@@ -114,5 +115,13 @@ class ShortUrlInputFilter extends InputFilter
         $this->add($title);
 
         $this->add($this->createBooleanInput(self::CRAWLABLE, false));
+
+        // TODO Validation of password
+        $password = $this->createInput(self::PASSWORD, false);
+        $password->getFilterChain()->attach(new Filter\Callback(
+            static fn (?string $value) => $value === null ? $value : substr($value, 0, 512),
+        ));
+        $this->add($password);
+
     }
 }
