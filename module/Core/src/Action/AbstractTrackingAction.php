@@ -11,6 +11,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Shlinkio\Shlink\Core\Entity\ShortUrl;
+use Shlinkio\Shlink\Core\ErrorHandler\MissingPasswordTemplateHandler;
+use Shlinkio\Shlink\Core\Exception\MissingShortUrlPasswordException;
 use Shlinkio\Shlink\Core\Exception\ShortUrlNotFoundException;
 use Shlinkio\Shlink\Core\Model\ShortUrlIdentifier;
 use Shlinkio\Shlink\Core\Service\ShortUrl\ShortUrlResolverInterface;
@@ -31,8 +33,9 @@ abstract class AbstractTrackingAction implements MiddlewareInterface, RequestMet
         try {
             $shortUrl = $this->urlResolver->resolveEnabledShortUrl($identifier);
             $this->requestTracker->trackIfApplicable($shortUrl, $request);
-
             return $this->createSuccessResp($shortUrl, $request);
+        } catch (MissingShortUrlPasswordException) {
+            return $this->createErrorResp($request, new MissingPasswordTemplateHandler());
         } catch (ShortUrlNotFoundException) {
             return $this->createErrorResp($request, $handler);
         }

@@ -10,6 +10,7 @@ use League\Uri\Uri;
 use Shlinkio\Shlink\Core\Entity\ShortUrl;
 use Shlinkio\Shlink\Core\Options\TrackingOptions;
 
+use function array_key_exists;
 use function sprintf;
 
 class ShortUrlRedirectionBuilder implements ShortUrlRedirectionBuilderInterface
@@ -31,6 +32,9 @@ class ShortUrlRedirectionBuilder implements ShortUrlRedirectionBuilderInterface
 
     private function resolveQuery(Uri $uri, array $currentQuery): ?string
     {
+        if (array_key_exists('__shlink_password', $currentQuery)) {
+            unset($currentQuery['__shlink_password']);
+        }
         $hardcodedQuery = Query::parse($uri->getQuery() ?? '');
 
         $disableTrackParam = $this->trackingOptions->getDisableTrackParam();

@@ -6,6 +6,7 @@ namespace Shlinkio\Shlink\Core\Service\ShortUrl;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Shlinkio\Shlink\Core\Entity\ShortUrl;
+use Shlinkio\Shlink\Core\Exception\MissingShortUrlPasswordException;
 use Shlinkio\Shlink\Core\Exception\ShortUrlNotFoundException;
 use Shlinkio\Shlink\Core\Model\ShortUrlIdentifier;
 use Shlinkio\Shlink\Core\Repository\ShortUrlRepository;
@@ -18,7 +19,7 @@ class ShortUrlResolver implements ShortUrlResolverInterface
     }
 
     /**
-     * @throws ShortUrlNotFoundException
+     * @throws ShortUrlNotFoundException MissingShortUrlPasswordException
      */
     public function resolveShortUrl(ShortUrlIdentifier $identifier, ?ApiKey $apiKey = null): ShortUrl
     {
@@ -28,20 +29,26 @@ class ShortUrlResolver implements ShortUrlResolverInterface
         if ($shortUrl === null) {
             throw ShortUrlNotFoundException::fromNotFound($identifier);
         }
+        if (!empty($shortUrl->password()) && $shortUrl->password() !== $identifier->password()) {
+            throw MissingShortUrlPasswordException::fromMissingPassword($identifier);
+        }
 
         return $shortUrl;
     }
 
     /**
-     * @throws ShortUrlNotFoundException
+     * @throws ShortUrlNotFoundException MissingShortUrlPasswordException
      */
     public function resolveEnabledShortUrl(ShortUrlIdentifier $identifier): ShortUrl
     {
         /** @var ShortUrlRepository $shortUrlRepo */
         $shortUrlRepo = $this->em->getRepository(ShortUrl::class);
         $shortUrl = $shortUrlRepo->findOneWithDomainFallback($identifier);
-        if (! $shortUrl?->isEnabled()) {
+        if (!$shortUrl?->isEnabled()) {
             throw ShortUrlNotFoundException::fromNotFound($identifier);
+        }
+        if (!empty($shortUrl->password()) && $shortUrl->password() !== $identifier->password()) {
+            throw MissingShortUrlPasswordException::fromMissingPassword($identifier);
         }
 
         return $shortUrl;

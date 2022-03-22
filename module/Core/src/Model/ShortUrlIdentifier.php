@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 
 final class ShortUrlIdentifier
 {
-    public function __construct(private string $shortCode, private ?string $domain = null)
+    public function __construct(private string $shortCode, private ?string $domain = null, private ?string $password = null)
     {
     }
 
@@ -18,16 +18,18 @@ final class ShortUrlIdentifier
     {
         $shortCode = $request->getAttribute('shortCode', '');
         $domain = $request->getQueryParams()['domain'] ?? null;
+        $password = $request->getQueryParams()['domain'] ?? null;
 
-        return new self($shortCode, $domain);
+        return new self($shortCode, $domain, $password);
     }
 
     public static function fromRedirectRequest(ServerRequestInterface $request): self
     {
         $shortCode = $request->getAttribute('shortCode', '');
         $domain = $request->getUri()->getAuthority();
+        $password = $request->getQueryParams()['__shlink_password'] ?? null;
 
-        return new self($shortCode, $domain);
+        return new self($shortCode, $domain, $password);
     }
 
     public static function fromCli(InputInterface $input): self
@@ -38,8 +40,12 @@ final class ShortUrlIdentifier
         $shortCode = $input->getArguments()['shortCode'] ?? '';
         /** @var string|null $domain */
         $domain = $input->getOptions()['domain'] ?? null;
+        $password = $input->getOption('password');
+        if (false === $password) {
+            $password = null;
+        }
 
-        return new self($shortCode, $domain);
+        return new self($shortCode, $domain, $password);
     }
 
     public static function fromShortUrl(ShortUrl $shortUrl): self
@@ -47,7 +53,7 @@ final class ShortUrlIdentifier
         $domain = $shortUrl->getDomain();
         $domainAuthority = $domain?->getAuthority();
 
-        return new self($shortUrl->getShortCode(), $domainAuthority);
+        return new self($shortUrl->getShortCode(), $domainAuthority, $shortUrl->password());
     }
 
     public static function fromShortCodeAndDomain(string $shortCode, ?string $domain = null): self
@@ -63,5 +69,10 @@ final class ShortUrlIdentifier
     public function domain(): ?string
     {
         return $this->domain;
+    }
+
+    public function password(): ?string
+    {
+        return $this->password;
     }
 }
