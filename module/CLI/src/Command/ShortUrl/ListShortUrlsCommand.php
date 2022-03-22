@@ -203,7 +203,7 @@ class ListShortUrlsCommand extends AbstractWithDateRangeCommand
             'Long URL' => $pickProp('longUrl'),
             'Date created' => $pickProp('dateCreated'),
             'Visits count' => $pickProp('visitsCount'),
-            'Password?' => $pickProp('password'),
+            'Password' => $pickProp('password'),
         ];
         if ($input->getOption('show-tags')) {
             $columnsMap['Tags'] = static fn (array $shortUrl): string => implode(', ', $shortUrl['tags']);

@@ -112,6 +112,19 @@ class CreateShortUrlCommand extends Command
                 'w',
                 InputOption::VALUE_NONE,
                 'Disables the forwarding of the query string to the long URL, when the new short URL is visited.',
+            )
+            ->addOption(
+                'title',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Gives a user-friendly title to the short URL.',
+            )
+            ->addOption(
+                'password',
+                'p',
+                InputOption::VALUE_OPTIONAL,
+                'Sets a password to protect the resolution of the short URL to the long URL.',
+                false,
             );
     }
 
@@ -119,6 +132,7 @@ class CreateShortUrlCommand extends Command
     {
         $this->verifyLongUrlArgument($input, $output);
         $this->verifyDomainArgument($input);
+        $this->verifyPasswordOption($input, $output);
     }
 
     private function verifyLongUrlArgument(InputInterface $input, OutputInterface $output): void
@@ -139,6 +153,20 @@ class CreateShortUrlCommand extends Command
     {
         $domain = $input->getOption('domain');
         $input->setOption('domain', $domain === $this->defaultDomain ? null : $domain);
+    }
+
+    protected function verifyPasswordOption(InputInterface $input, OutputInterface $output): void
+    {
+        $password = $input->getOption('password');
+        if (null === $password) {
+            $io = new SymfonyStyle($input, $output);
+            $password = $io->ask('Please enter the password you want to set for this short URL');
+            if (!empty($password)) {
+                $input->setOption('password', $password);
+            }
+        } elseif (false === $password) {
+            $input->setOption('password', null);
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): ?int
@@ -171,6 +199,8 @@ class CreateShortUrlCommand extends Command
                 ShortUrlInputFilter::TAGS => $tags,
                 ShortUrlInputFilter::CRAWLABLE => $input->getOption('crawlable'),
                 ShortUrlInputFilter::FORWARD_QUERY => !$input->getOption('no-forward-query'),
+                ShortUrlInputFilter::TITLE => $input->getOption('title'),
+                ShortUrlInputFilter::PASSWORD => $input->getOption('password'),
             ]));
 
             $io->writeln([
