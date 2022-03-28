@@ -11,6 +11,10 @@
 
 A PHP-based self-hosted URL shortener that can be used to serve shortened URLs under your own domain.
 
+| **WHAT'S DIFFERENT IN THIS FORK**|
+| --- |
+>  **Short URL links can be protected with a password** - be aware that this only protects the resolution of the short URL into the corresponding long URL, not the target web content
+
 ## Table of Contents
 
 - [Full documentation](#full-documentation)
